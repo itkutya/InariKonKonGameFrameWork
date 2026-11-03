@@ -1,0 +1,17 @@
+set(INARIKONKON_UTILITY_MODULES
+    ${CMAKE_CURRENT_LIST_DIR}/Utility.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Version.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/ProjectVersion.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/NonCopyable.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/NonMovable.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/NonConstructible.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Log.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Flag.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/DebugUtils.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Time.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Stopwatch.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Color.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/TypeUtils.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Error.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Hierarchy.cppm
+    PARENT_SCOPE)

@@ -1,0 +1,14 @@
+set(INARIKONKON_MATH_MODULES
+    ${CMAKE_CURRENT_LIST_DIR}/Math.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/NumericCasts.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Number.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Clamped.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Vector.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/WorldVectors.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Matrix.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Angle.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/EulerAngles.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Quaternion.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Rect.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Dimension.cppm
+    PARENT_SCOPE)

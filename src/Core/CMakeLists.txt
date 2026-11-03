@@ -1,0 +1,13 @@
+set(INARIKONKON_CORE_MODULES
+    ${CMAKE_CURRENT_LIST_DIR}/Core.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Application/Application.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Scene/Scene.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Scene/SceneManager.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Window/Window.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Event/Event.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Event/EventCallbackFuncs.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Event/EventManager.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Renderer/Renderer.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Renderer/Vulkan/Vulkan.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Renderer/OpenGL/OpenGL.cppm
+    PARENT_SCOPE)

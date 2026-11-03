@@ -1,0 +1,10 @@
+set(INARIKONKON_ECS_MODULES
+    ${CMAKE_CURRENT_LIST_DIR}/ECS.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/EntityContext.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Entity.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/EntityManager.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Components/Components.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Components/MeshRenderer.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Components/Transform.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Systems/RenderSystem.cppm
+    PARENT_SCOPE)

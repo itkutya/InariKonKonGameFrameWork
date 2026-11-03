@@ -1,0 +1,12 @@
+set(INARIKONKON_INPUT_MODULES
+    ${CMAKE_CURRENT_LIST_DIR}/Input.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/InputState.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/InputCommon.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/InputCombination.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/InputManager.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Keyboard.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Mouse.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Joystick.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/PhysicalJoystick.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/InputConverters.cppm
+    PARENT_SCOPE)

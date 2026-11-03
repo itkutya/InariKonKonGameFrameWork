@@ -1,0 +1,16 @@
+export module ProjectVersion;
+
+import Version;
+
+export namespace ikk
+{
+    consteval Version getProjectVersion() noexcept
+    {
+        return Version
+            {
+                .major = @PROJECT_VERSION_MAJOR@,
+                .minor = @PROJECT_VERSION_MINOR@,
+                .patch = @PROJECT_VERSION_PATCH@
+            };
+    }
+}
