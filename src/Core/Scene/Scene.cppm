@@ -6,7 +6,6 @@ module;
 
 export module Scene;
 
-import AssetManager;
 import EntityManager;
 import InputManager;
 import Event;
@@ -72,9 +71,6 @@ export namespace ikk
 
         [[nodiscard]] const EntityManager& getEntityManager() const noexcept;
         [[nodiscard]] EntityManager& getEntityManager() noexcept;
-
-        [[nodiscard]] const AssetManager& getAssetManager() const noexcept;
-        [[nodiscard]] AssetManager& getAssetManager() noexcept;
     protected:
         IScene() noexcept = default;
 
@@ -88,7 +84,6 @@ export namespace ikk
 
         InputManager m_inputManager{};
         EntityManager m_entityManager{};
-        AssetManager m_assetManager{};
     };
 
     template<class T>
@@ -137,15 +132,5 @@ namespace ikk
     EntityManager& IScene::getEntityManager() noexcept
     {
         return this->m_entityManager;
-    }
-
-    const AssetManager& IScene::getAssetManager() const noexcept
-    {
-        return this->m_assetManager;
-    }
-
-    AssetManager& IScene::getAssetManager() noexcept
-    {
-        return this->m_assetManager;
     }
 }

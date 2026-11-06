@@ -173,7 +173,6 @@ namespace ikk
         const Time dt = this->m_deltaTimeClock.restart();
 
         scene.getInputManager().update(dt);
-        scene.getAssetManager().update();
         scene.onUpdate(dt);
     }
 

@@ -1,24 +1,31 @@
 module;
 
-#include <compare>
-#include <cstdint>
-#include <variant>
 #include <cassert>
+#include <chrono>
+#include <filesystem>
+#include <functional>
+#include <future>
+#include <optional>
+#include <utility>
+#include <variant>
 
 export module Asset;
 
-import ResourceLoader;
+import ResourceTraits;
+import Time;
 
 export namespace ikk
 {
-    template<AnyResource T>
+    template<ResourceType T>
     class Asset
     {
     public:
-        inline static constexpr Resource::ID InvalidID = 0;
-
         Asset() noexcept = default;
-        Asset(Resource::ID id, T* resource, LoadingState state) noexcept;
+
+        template<class... Args>
+        explicit Asset(const std::filesystem::path& path, Args&&... args) noexcept;
+
+        explicit Asset(std::future<T>&& resource) noexcept;
 
         Asset(const Asset&) noexcept = default;
         Asset(Asset&&) noexcept = default;
@@ -28,103 +35,129 @@ export namespace ikk
 
         ~Asset() noexcept = default;
 
-        [[nodiscard]] const T* get() const noexcept;
-        [[nodiscard]] T* get() noexcept;
+        [[nodiscard]] operator T() noexcept;
 
-        [[nodiscard]] const T& operator*() const noexcept;
-        [[nodiscard]] T& operator*() noexcept;
-
-        [[nodiscard]] const T* operator->() const noexcept;
-        [[nodiscard]] T* operator->() noexcept;
+        [[nodiscard]] bool holdsResource() const noexcept;
+        [[nodiscard]] bool isLoaded(const Time& waitFor = seconds(0)) noexcept;
 
         [[nodiscard]] LoadingState getLoadingState() const noexcept;
+        [[nodiscard]] std::optional<std::reference_wrapper<T>> getResource() noexcept;
 
-        [[nodiscard]] explicit operator bool() const noexcept;
-
-        [[nodiscard]] Resource::ID id() const noexcept;
-
-        [[nodiscard]] bool isValid() const noexcept;
-
-        [[nodiscard]] auto operator<=>(const Asset&) const noexcept = default;
+        void unload() noexcept;
     private:
-        Resource::ID m_id = InvalidID;
-        T* m_resource = nullptr;
-        LoadingState m_loadingState = LoadingState::Unloaded;
+        struct ImmediateResource
+        {
+            T resource;
+        };
+
+        struct FutureResource
+        {
+            std::future<T> resource{};
+        };
+
+        std::variant<std::monostate, ImmediateResource, FutureResource> m_resource{};
+        LoadingState m_loadingState{ LoadingState::Unloaded };
     };
 }
 
 namespace ikk
 {
-    template<AnyResource T>
-    Asset<T>::Asset(Resource::ID id, T* resource, LoadingState state) noexcept
-        : m_id(id), m_resource(resource), m_loadingState(state)
+    template<ResourceType T>
+    template<class ... Args>
+    Asset<T>::Asset(const std::filesystem::path& path, Args&&... args) noexcept
+        : m_resource(ImmediateResource{ .resource = T{ path, std::forward<Args>(args)... } }),
+          m_loadingState(LoadingState::Loaded)
     {
     }
 
-    //TODO: how much time we can wait as a parameter
-    template<AnyResource T>
-    const T* Asset<T>::get() const noexcept
+    template<ResourceType T>
+    Asset<T>::Asset(std::future<T>&& resource) noexcept
+        : m_resource(FutureResource{ .resource = std::move(resource) }),
+          m_loadingState(LoadingState::Loading)
     {
-        //TODO:
-        // wait till resource is loaded
-        return this->m_resource;
     }
 
-    template<AnyResource T>
-    T* Asset<T>::get() noexcept
+    template<ResourceType T>
+    Asset<T>::operator T() noexcept
     {
-        return this->m_resource;
+        assert(this->isLoaded() == true);
+        return this->getResource().value();
     }
 
-    template<AnyResource T>
-    const T& Asset<T>::operator*() const noexcept
+    template<ResourceType T>
+    bool Asset<T>::holdsResource() const noexcept
     {
-        assert(this->isValid() == true);
-        assert(this->m_resource != nullptr);
-        return *this->m_resource;
+        return std::holds_alternative<std::monostate>(this->m_resource) == false;
     }
 
-    template<AnyResource T>
-    T& Asset<T>::operator*() noexcept
+    template<ResourceType T>
+    bool Asset<T>::isLoaded(const Time& waitFor) noexcept
     {
-        assert(this->isValid() == true);
-        assert(this->m_resource != nullptr);
-        return *this->m_resource;
+        if (std::holds_alternative<FutureResource>(this->m_resource))
+        {
+            try
+            {
+                if (auto& [resource] = std::get<FutureResource>(this->m_resource);
+                resource.wait_for(waitFor.toDuration<std::chrono::nanoseconds>()) == std::future_status::ready)
+                {
+                    this->m_loadingState = LoadingState::Loaded;
+                    return true;
+                }
+                return false;
+            }
+            catch (...)
+            {
+                this->m_loadingState = LoadingState::Failed;
+                return false;
+            }
+        }
+        else
+            return this->m_loadingState == LoadingState::Loaded;
     }
 
-    template<AnyResource T>
-    const T* Asset<T>::operator->() const noexcept
-    {
-        return this->m_resource;
-    }
-
-    template<AnyResource T>
-    T* Asset<T>::operator->() noexcept
-    {
-        return this->m_resource;
-    }
-
-    template<AnyResource T>
+    template<ResourceType T>
     LoadingState Asset<T>::getLoadingState() const noexcept
     {
         return this->m_loadingState;
     }
 
-    template<AnyResource T>
-    Asset<T>::operator bool() const noexcept
+    template<ResourceType T>
+    std::optional<std::reference_wrapper<T>> Asset<T>::getResource() noexcept
     {
-        return this->isValid() == true;
+        if (this->isLoaded() == false)
+            return std::nullopt;
+
+        if (std::holds_alternative<ImmediateResource>(this->m_resource))
+            return std::ref(std::get<ImmediateResource>(this->m_resource).resource);
+
+        try
+        {
+            this->m_resource = ImmediateResource{ .resource = std::move(std::get<FutureResource>(this->m_resource).resource.get()) };
+            return std::ref(std::get<ImmediateResource>(this->m_resource).resource);
+        }
+        catch (...)
+        {
+            this->m_loadingState = LoadingState::Failed;
+            return std::nullopt;
+        }
     }
 
-    template<AnyResource T>
-    bool Asset<T>::isValid() const noexcept
+    template<ResourceType T>
+    void Asset<T>::unload() noexcept
     {
-        return this->m_id != InvalidID;
-    }
+        if (this->isLoaded() == true)
+        {
+            try
+            {
+                this->m_resource = std::monostate{};
+                this->m_loadingState = LoadingState::Unloaded;
+            }
+            catch (...)
+            {
+                this->m_loadingState = LoadingState::Failed;
+            }
+        }
 
-    template<AnyResource T>
-    Resource::ID Asset<T>::id() const noexcept
-    {
-        return this->m_id;
+        //TODO: unload failed resources...
     }
 }

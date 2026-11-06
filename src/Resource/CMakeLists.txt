@@ -1,6 +1,6 @@
 set(INARIKONKON_RESOURCE_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Resource.cppm
-    ${CMAKE_CURRENT_LIST_DIR}/AssetManager.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/ResourceTraits.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Asset.cppm
     ${CMAKE_CURRENT_LIST_DIR}/ResourceLoader.cppm
     PARENT_SCOPE)
