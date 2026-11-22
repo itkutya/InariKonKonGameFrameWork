@@ -25,9 +25,9 @@ int main()
         assert((InputCombination{Keyboard::W, Joystick::Axis::LY} == moveCombination));
 
         InputCombination editableCombination{Keyboard::W};
-        editableCombination.add(Joystick::HatState::Up);
+        editableCombination.add(Joystick::Hat::Index{0});
         assert(editableCombination.count() == 2);
-        assert(std::get<Joystick::HatState>(editableCombination[1]) == Joystick::HatState::Up);
+        assert(std::get<Joystick::Hat::Index>(editableCombination[1]) == 0);
     }
 
     // Bind combinations to action names and configure their callbacks/repeat behavior.

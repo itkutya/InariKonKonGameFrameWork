@@ -1,7 +1,3 @@
-module;
-
-#include <memory>
-
 export module RenderSystem;
 
 import MeshRenderer;
@@ -12,13 +8,13 @@ export namespace ikk
 {
     struct RenderSystem
     {
-        std::unique_ptr<IRenderer>& renderer;
+        IRenderer* renderer;
 
         void operator()(const Entity& entity, const MeshRenderer& drawable) const noexcept
         {
             //TODO: Check if entity has Transform, or other stuff...
-            if (drawable.material.shader != nullptr)
-                this->renderer->draw(drawable.mesh);
+            if (this->renderer != nullptr)
+                this->renderer->draw(drawable.mesh, drawable.material);
 
             /*
              * if (renderer->checkIfExists(mesh) == false)

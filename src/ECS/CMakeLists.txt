@@ -6,5 +6,6 @@ set(INARIKONKON_ECS_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Components/Components.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Components/MeshRenderer.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Components/Transform.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Systems/Systems.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Systems/RenderSystem.cppm
     PARENT_SCOPE)

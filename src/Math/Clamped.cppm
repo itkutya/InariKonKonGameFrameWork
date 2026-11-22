@@ -1,12 +1,6 @@
-module;
-
-#include <algorithm>
-#include <compare>
-#include <cstdint>
-#include <limits>
-#include <type_traits>
-
 export module Clamped;
+
+import std;
 
 import NonConstructible;
 import Number;
@@ -80,6 +74,9 @@ export namespace ikk
         constexpr Clamped& operator=(Clamped<U, OtherMin, OtherMax>&& other) noexcept;
 
         constexpr ~Clamped() noexcept = default;
+
+        [[nodiscard]] static T min() noexcept;
+        [[nodiscard]] static T max() noexcept;
 
         [[nodiscard]] constexpr Clamped operator+(const Clamped& other) const noexcept;
         [[nodiscard]] constexpr Clamped operator-(const Clamped& other) const noexcept;
@@ -182,6 +179,18 @@ namespace ikk
     {
         this->m_value = this->convertValueFromOtherRange<U, OtherMin, OtherMax>(other.value());
         return *this;
+    }
+
+    template<Number T, T Min, T Max>
+    T Clamped<T, Min, Max>::min() noexcept
+    {
+        return Min;
+    }
+
+    template<Number T, T Min, T Max>
+    T Clamped<T, Min, Max>::max() noexcept
+    {
+        return Max;
     }
 
     template<Number T, T Min, T Max>
@@ -344,3 +353,12 @@ namespace ikk
         return static_cast<T>(std::clamp(result, thisMin, thisMax));
     }
 }
+
+template<ikk::Number T>
+struct std::numeric_limits<ikk::Clamped<T>>
+{
+    static constexpr bool is_specialized = true;
+
+    static constexpr T min() noexcept { return ikk::Clamped<T>::min(); }
+    static constexpr T max() noexcept { return ikk::Clamped<T>::max(); }
+};

@@ -1,11 +1,6 @@
-module;
-
-#include <concepts>
-#include <tuple>
-#include <type_traits>
-#include <variant>
-
 export module TypeUtils;
+
+import std;
 
 import NonConstructible;
 
@@ -127,4 +122,10 @@ export namespace ikk
         inline static constexpr bool IsConst = false;
         inline static constexpr bool IsNoexcept = false;
     };
+
+    template<class T>
+    [[nodiscard]] constexpr std::size_t getTypeID() noexcept
+    {
+        return typeid(std::remove_cvref_t<T>).hash_code();
+    }
 }

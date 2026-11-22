@@ -1,20 +1,9 @@
-module;
-
-#include <initializer_list>
-#include <type_traits>
-#include <algorithm>
-#include <concepts>
-#include <cassert>
-#include <cstddef>
-#include <utility>
-#include <vector>
-#include <ranges>
-#include <tuple>
-#include <span>
-
 export module VertexBuffer;
 
+import std;
+
 import Vertex;
+import Assert;
 
 export namespace ikk
 {
@@ -27,7 +16,7 @@ export namespace ikk
     template<class... Attributes>
     [[nodiscard]] inline constexpr VertexFormat<Attributes...>::Types vertex(Attributes&&... attributes) noexcept
     {
-        return { std::forward<Attributes>(attributes)... };
+        return typename VertexFormat<Attributes...>::Types{ std::forward<Attributes>(attributes)... };
     }
 
     class [[nodiscard]] VertexBuffer final
@@ -82,11 +71,10 @@ namespace ikk
             std::apply([this](const VertexAttributes&... attributes) noexcept
                 {
                     this->m_vertices.emplace_back(attributes...);
-                },
-                vertex);
+                }, vertex);
         }
 
-        this->m_stride = Vertex::stride<VertexAttributes...>();
+        this->m_stride = Vertex::calculateStride<VertexAttributes...>();
 
         const Vertex::Layout<VertexAttributes...> layout = Vertex::createLayout<VertexAttributes...>();
         this->m_attributes.assign(layout.begin(), layout.end());

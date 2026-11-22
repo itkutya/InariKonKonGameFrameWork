@@ -14,4 +14,5 @@ set(INARIKONKON_UTILITY_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/TypeUtils.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Error.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Hierarchy.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Assert.cppm
     PARENT_SCOPE)

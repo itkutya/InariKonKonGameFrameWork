@@ -2,12 +2,12 @@ module;
 
 #include <concepts>
 #include <cstdint>
+#include <memory>
 #include <string_view>
 
 export module Scene;
 
-import EntityManager;
-import InputManager;
+import Renderer;
 import Event;
 import Time;
 
@@ -56,7 +56,7 @@ export namespace ikk
         {
         }
 
-        inline virtual void onRender() noexcept
+        inline virtual void onRender(const std::unique_ptr<IRenderer>&) noexcept
         {
         }
 
@@ -65,12 +65,6 @@ export namespace ikk
         void activate() noexcept;
         void suspend() noexcept;
         void destroy() noexcept;
-
-        [[nodiscard]] const InputManager& getInputManager() const noexcept;
-        [[nodiscard]] InputManager& getInputManager() noexcept;
-
-        [[nodiscard]] const EntityManager& getEntityManager() const noexcept;
-        [[nodiscard]] EntityManager& getEntityManager() noexcept;
     protected:
         IScene() noexcept = default;
 
@@ -81,9 +75,6 @@ export namespace ikk
         IScene& operator=(IScene&&) noexcept = default;
     private:
         State m_state{State::Uninitialized};
-
-        InputManager m_inputManager{};
-        EntityManager m_entityManager{};
     };
 
     template<class T>
@@ -112,25 +103,5 @@ namespace ikk
     void IScene::destroy() noexcept
     {
         this->m_state = State::Deleted;
-    }
-
-    const InputManager& IScene::getInputManager() const noexcept
-    {
-        return this->m_inputManager;
-    }
-
-    InputManager& IScene::getInputManager() noexcept
-    {
-        return this->m_inputManager;
-    }
-
-    const EntityManager& IScene::getEntityManager() const noexcept
-    {
-        return this->m_entityManager;
-    }
-
-    EntityManager& IScene::getEntityManager() noexcept
-    {
-        return this->m_entityManager;
     }
 }

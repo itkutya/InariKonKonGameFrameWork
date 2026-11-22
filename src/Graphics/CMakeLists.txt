@@ -6,4 +6,6 @@ set(INARIKONKON_GRAPHICS_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Mesh.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Material.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Shader.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Camera.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Buffer.cppm
     PARENT_SCOPE)

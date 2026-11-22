@@ -59,8 +59,6 @@ export namespace ikk
         template<InputType T>
         [[nodiscard]] InputState getInputState(T inputType) const noexcept;
 
-        std::vector<Event> getJoystickEvents() noexcept;
-
         void handleEvent(const Event& e) noexcept;
         void update(const Time& dt) noexcept;
     private:
@@ -170,41 +168,6 @@ namespace ikk
             return it->second;
         else
             return InputState{};
-    }
-
-    std::vector<Event> InputManager::getJoystickEvents() noexcept
-    {
-        const auto trueJoysticks =
-            [](const PhysicalJoystick& physicalJoystick) noexcept
-            {
-                return physicalJoystick.isGamepadInputAvailable() == true;
-            };
-
-        std::vector<Event> joystickEvents{};
-        for (const PhysicalJoystick& joystick : this->m_joysticks | std::views::filter(trueJoysticks))
-        {
-            for (std::size_t i = 1; i <= Joystick::ButtonCount; ++i)
-            {
-                const auto button = static_cast<Joystick::Button>(i);
-                if (const Input::Action action = joystick.getJoystickButtonState(button); this->getInputState(button) != action)
-                    joystickEvents.emplace_back(InputEvent::Joystick::Button{ .id = joystick.getID(), .button = button, .action = action });
-            }
-
-            for (std::size_t i = 1; i <= Joystick::AxisCount; ++i)
-            {
-                const auto axis = static_cast<Joystick::Axis>(i);
-                if (const float delta = joystick.getJoystickAxisValue(axis); static_cast<float>(this->getInputState(axis)) != delta)
-                    joystickEvents.emplace_back(InputEvent::Joystick::Axis{ .id = joystick.getID(), .axis = axis, .delta = delta });
-            }
-
-            for (Joystick::Hat::Index i = 0; i < joystick.getJoystickHatsCount(); ++i)
-            {
-                if (const Flag<Joystick::Hat::State> state = joystick.getJoystickHatState(i);
-                    static_cast<Flag<Joystick::Hat::State>>(this->getInputState(i)) != state)
-                    joystickEvents.emplace_back(InputEvent::Joystick::Hat{ .id = joystick.getID(), .hat = {.index = i, .state = state} });
-            }
-        }
-        return joystickEvents;
     }
 
     void InputManager::handleEvent(const Event& e) noexcept

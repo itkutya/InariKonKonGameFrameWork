@@ -12,6 +12,7 @@ module;
 
 export module Application;
 
+import JoystickManager;
 import EventManager;
 import SceneManager;
 import NonCopyable;
@@ -23,8 +24,6 @@ import Window;
 import Event;
 import Scene;
 import Time;
-
-import RenderSystem;
 
 export namespace ikk
 {
@@ -61,6 +60,7 @@ export namespace ikk
         Stopwatch m_deltaTimeClock{};
         SceneManager m_sceneManager{};
         Version m_version{};
+        JoystickManager m_joystickManager{};
 
         Window m_window;
 
@@ -156,13 +156,13 @@ namespace ikk
     {
         EventManager& eventManager = this->m_window.getEventManager();
 
-        std::vector<Event> joystickEvents = scene.getInputManager().getJoystickEvents();
+        std::vector<Event> joystickEvents = this->m_joystickManager.getJoystickEvents();
         eventManager.push_range(joystickEvents);
 
         for (const Event& event : eventManager)
         {
+            this->m_joystickManager.handleEvent(event);
             scene.onEvent(event);
-            scene.getInputManager().handleEvent(event);
         }
 
         eventManager.clear();
@@ -171,18 +171,15 @@ namespace ikk
     void Application::update(IScene& scene) noexcept
     {
         const Time dt = this->m_deltaTimeClock.restart();
-
-        scene.getInputManager().update(dt);
         scene.onUpdate(dt);
     }
 
     void Application::render(IScene& scene) noexcept
     {
-        if (std::unique_ptr<IRenderer>& renderer = this->m_window.getRenderer(); renderer != nullptr &&
+        if (const std::unique_ptr<IRenderer>& renderer = this->m_window.getRenderer(); renderer != nullptr &&
             renderer->beginFrame(this->m_window.getSettings().clearColor) == true)
         {
-            scene.onRender();
-            scene.getEntityManager().update(RenderSystem{renderer});
+            scene.onRender(renderer);
             renderer->endFrame();
         }
     }

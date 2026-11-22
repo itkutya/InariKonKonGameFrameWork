@@ -7,6 +7,7 @@ module;
 
 export module Renderer;
 
+import Material;
 import Color;
 import Mesh;
 
@@ -31,7 +32,7 @@ export namespace ikk
         [[nodiscard]] virtual bool beginFrame(const Color& clearColor) noexcept = 0;
         virtual void endFrame() noexcept = 0;
 
-        virtual void draw(const Mesh& mesh) noexcept = 0;
+        virtual void draw(const Mesh& mesh, const Material& material) noexcept = 0;
     };
 
     template<class T>

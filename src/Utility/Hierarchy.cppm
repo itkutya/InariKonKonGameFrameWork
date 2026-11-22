@@ -12,9 +12,6 @@ export namespace ikk
     class Hierarchy
     {
     public:
-        Hierarchy(const Hierarchy&) noexcept = delete;
-        Hierarchy& operator=(const Hierarchy&) noexcept = delete;
-
         [[nodiscard]] const std::vector<T*>& getChildren() const noexcept;
         [[nodiscard]] const T* getParent() const noexcept;
 
@@ -29,7 +26,10 @@ export namespace ikk
 
         Hierarchy() noexcept = default;
 
+        Hierarchy(const Hierarchy& other) noexcept;
         Hierarchy(Hierarchy&& other) noexcept;
+
+        Hierarchy& operator=(const Hierarchy& other) noexcept;
         Hierarchy& operator=(Hierarchy&& other) noexcept;
 
         ~Hierarchy() noexcept;
@@ -101,6 +101,13 @@ namespace ikk
         }
     }
 
+    //TODO:
+    template<class T>
+    Hierarchy<T>::Hierarchy(const Hierarchy& other) noexcept
+        : m_parent(other.m_parent), m_children(other.m_children)
+    {
+    }
+
     template<class T>
     Hierarchy<T>::Hierarchy(Hierarchy&& other) noexcept
     {
@@ -109,6 +116,18 @@ namespace ikk
 
         while (other.m_children.empty() == false)
             this->addChild(*other.m_children.back());
+    }
+
+    //TODO:
+    template<class T>
+    Hierarchy<T>& Hierarchy<T>::operator=(const Hierarchy& other) noexcept
+    {
+        if (this != &other)
+        {
+            this->m_parent = other.m_parent;
+            this->m_children = other.m_children;
+        }
+        return *this;
     }
 
     template<class T>

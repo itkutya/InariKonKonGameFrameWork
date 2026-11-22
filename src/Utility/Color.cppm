@@ -1,11 +1,6 @@
-module;
-
-#include <array>
-#include <cstdint>
-#include <limits>
-#include <type_traits>
-
 export module Color;
+
+import std;
 
 import NumericCasts;
 import Clamped;

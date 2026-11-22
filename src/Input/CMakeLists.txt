@@ -9,4 +9,5 @@ set(INARIKONKON_INPUT_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Joystick.cppm
     ${CMAKE_CURRENT_LIST_DIR}/PhysicalJoystick.cppm
     ${CMAKE_CURRENT_LIST_DIR}/InputConverters.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/JoystickManager.cppm
     PARENT_SCOPE)

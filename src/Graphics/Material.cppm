@@ -6,6 +6,7 @@ export namespace ikk
 {
     struct Material
     {
-        Shader* shader = nullptr;
+        const Shader<ShaderType::Vertex>* vertexShader = nullptr;
+        const Shader<ShaderType::Fragment>* fragmentShader = nullptr;
     };
 }

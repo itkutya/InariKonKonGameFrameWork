@@ -62,11 +62,3 @@ set(EXTERNAL_LIBRARIES
     glad_gl_core_46)
 
 target_link_libraries(Dependencies INTERFACE ${EXTERNAL_LIBRARIES})
-
-foreach(DEPENDENCY IN LISTS EXTERNAL_LIBRARIES)
-  get_target_property(INCLUDES ${DEPENDENCY} INTERFACE_INCLUDE_DIRECTORIES)
-
-  if(INCLUDES)
-    target_include_directories(Dependencies SYSTEM INTERFACE ${INCLUDES})
-  endif()
-endforeach()

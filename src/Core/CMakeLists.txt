@@ -10,4 +10,6 @@ set(INARIKONKON_CORE_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/Renderer.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/Vulkan/Vulkan.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/OpenGL/OpenGL.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Renderer/OpenGL/Objects/ObjectBuffers.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Renderer/OpenGL/Objects/ShaderProgram.cppm
     PARENT_SCOPE)

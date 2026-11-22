@@ -1,5 +1,7 @@
 export module InariKonKon;
 
+export import std;
+
 export import Graphics;
 export import Utility;
 export import Input;

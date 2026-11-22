@@ -9,6 +9,7 @@ export import TypeUtils;
 export import Hierarchy;
 export import Stopwatch;
 export import Version;
+export import Assert;
 export import Error;
 export import Color;
 export import Time;
