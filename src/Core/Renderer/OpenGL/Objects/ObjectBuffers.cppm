@@ -77,70 +77,70 @@ namespace ikk
 
         const auto getAttributeFormat = [] [[nodiscard]] (std::size_t hash) noexcept -> std::optional<AttributeFormat>
             {
-                if (hash == getTypeID<float>())
+                if (hash == getTypeHashOf<float>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,
                             .componentCount = 1,
                             .attributeType = AttributeType::Float
                         }};
-                if (hash == getTypeID<std::int32_t>())
+                if (hash == getTypeHashOf<std::int32_t>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_INT,
                             .componentCount = 1,
                             .attributeType = AttributeType::Int
                         }};
-                if (hash == getTypeID<std::uint32_t>())
+                if (hash == getTypeHashOf<std::uint32_t>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_UNSIGNED_INT,
                             .componentCount = 1,
                             .attributeType = AttributeType::UnsignedInt
                         }};
-                if (hash == getTypeID<Vec2f>())
+                if (hash == getTypeHashOf<Vec2f>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,
                             .componentCount = 2,
                             .attributeType = AttributeType::Float
                         }};
-                if (hash == getTypeID<Vec3f>())
+                if (hash == getTypeHashOf<Vec3f>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,
                             .componentCount = 3,
                             .attributeType = AttributeType::Float
                         }};
-                if (hash == getTypeID<Vec4f>())
+                if (hash == getTypeHashOf<Vec4f>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,
                             .componentCount = 4,
                             .attributeType = AttributeType::Float
                         }};
-                if (hash == getTypeID<Mat3x3f>())
+                if (hash == getTypeHashOf<Mat3x3f>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,
                             .componentCount = 9,
                             .attributeType = AttributeType::Float
                         }};
-                if (hash == getTypeID<Mat4x4f>())
+                if (hash == getTypeHashOf<Mat4x4f>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,
                             .componentCount = 16,
                             .attributeType = AttributeType::Float
                         }};
-                if (hash == getTypeID<Color>())
+                if (hash == getTypeHashOf<Color>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_UNSIGNED_BYTE,
                             .componentCount = 4,
                             .attributeType = AttributeType::UnsignedByte
                         }};
-                if (hash == getTypeID<Colorf>())
+                if (hash == getTypeHashOf<Colorf>())
                     return std::optional{AttributeFormat
                         {
                             .type = GL_FLOAT,

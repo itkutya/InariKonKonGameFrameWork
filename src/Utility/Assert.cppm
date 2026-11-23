@@ -2,12 +2,16 @@ export module Assert;
 
 import std;
 
+import DebugUtils;
 import Log;
 
 export namespace ikk
 {
     void assert(bool condition, std::source_location location = std::source_location::current()) noexcept
     {
+        if constexpr (isReleaseBuild() == true)
+            return;
+
         if (condition == false)
         {
             Log::Critical("File: {}, function: {}, {}:{}",
@@ -18,6 +22,9 @@ export namespace ikk
 
     void assert(bool condition, std::string_view message, std::source_location location = std::source_location::current()) noexcept
     {
+        if constexpr (isReleaseBuild() == true)
+            return;
+
         if (condition == false)
         {
             Log::Critical("{}, File: {}, function: {}, {}:{}", message,

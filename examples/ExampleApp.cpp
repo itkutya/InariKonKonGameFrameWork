@@ -60,13 +60,10 @@ public:
 
         mesh.vertexBuffer = ikk::VertexBuffer
             {
-                ikk::VertexFormat<ikk::Position2D, ikk::Colorf>{},
-                {
-                    ikk::vertex(ikk::Position2D{-1.f, -1.f}, ikk::Colorf::Teto()),
-                    ikk::vertex(ikk::Position2D{ 1.f, -1.f}, ikk::Colorf::Miku()),
-                    ikk::vertex(ikk::Position2D{ 1.f,  1.f}, ikk::Colorf::Rin()),
-                    ikk::vertex(ikk::Position2D{-1.f,  1.f}, ikk::Colorf::CornflowerBlue())
-                }
+                ikk::vertex(ikk::Position2D{-1.f, -1.f}, ikk::Color::Teto()),
+                ikk::vertex(ikk::Position2D{ 1.f, -1.f}, ikk::Color::Miku()),
+                ikk::vertex(ikk::Position2D{ 1.f,  1.f}, ikk::Color::Rin()),
+                ikk::vertex(ikk::Position2D{-1.f,  1.f}, ikk::Color::CornflowerBlue())
             };
         mesh.indexBuffer =
             {

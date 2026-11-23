@@ -26,8 +26,9 @@ export namespace ikk
 
         [[nodiscard]] constexpr VertexBuffer() noexcept = default;
 
-        template<class... Attributes, class... VertexAttributes>
-        [[nodiscard]] constexpr VertexBuffer(VertexFormat<Attributes...>, std::initializer_list<std::tuple<VertexAttributes...>> vertices) noexcept;
+        template<class... Attributes, class... Vertices>
+            requires (sizeof...(Attributes) > 0) && (std::same_as<std::remove_cvref_t<Vertices>, typename VertexFormat<Attributes...>::Types> && ...)
+        [[nodiscard]] constexpr VertexBuffer(std::tuple<Attributes...> first, Vertices&&... rest) noexcept;
 
         constexpr VertexBuffer(const VertexBuffer&) noexcept = default;
         constexpr VertexBuffer(VertexBuffer&&) noexcept = default;
@@ -48,6 +49,12 @@ export namespace ikk
 
         [[nodiscard]] constexpr std::span<const Vertex> vertices() const noexcept;
         [[nodiscard]] constexpr std::span<Vertex> vertices() noexcept;
+
+        [[nodiscard]] constexpr std::vector<Vertex>::const_iterator begin() const noexcept;
+        [[nodiscard]] constexpr std::vector<Vertex>::iterator begin() noexcept;
+
+        [[nodiscard]] constexpr std::vector<Vertex>::const_iterator end() const noexcept;
+        [[nodiscard]] constexpr std::vector<Vertex>::iterator end() noexcept;
     private:
         std::vector<Vertex> m_vertices{};
         VertexLayout m_attributes{};
@@ -57,27 +64,25 @@ export namespace ikk
 
 namespace ikk
 {
-    template<class... Attributes, class... VertexAttributes>
-    constexpr VertexBuffer::VertexBuffer(VertexFormat<Attributes...>, std::initializer_list<std::tuple<VertexAttributes...>> vertices) noexcept
+    template<class... Attributes, class... Vertices>
+        requires (sizeof...(Attributes) > 0) && (std::same_as<std::remove_cvref_t<Vertices>, typename VertexFormat<Attributes...>::Types> && ...)
+    constexpr VertexBuffer::VertexBuffer(std::tuple<Attributes...> first, Vertices&&... rest) noexcept
+        : m_stride(Vertex::calculateStride<Attributes...>())
     {
-        static_assert(sizeof...(Attributes) > 0);
-        static_assert(sizeof...(VertexAttributes) == sizeof...(Attributes));
-        static_assert(std::same_as<std::tuple<Attributes...>, std::tuple<VertexAttributes...>>, "Vertex format and vertex data types do not match");
+        this->m_vertices.reserve(1 + sizeof...(Vertices));
 
-        this->m_vertices.reserve(vertices.size());
+        const auto append = [this](const auto& data)
+            {
+                std::apply([this](const Attributes&... attributes)
+                    {
+                        this->m_vertices.emplace_back(attributes...);
+                    }, data);
+            };
 
-        for (const std::tuple<VertexAttributes...>& vertex : vertices)
-        {
-            std::apply([this](const VertexAttributes&... attributes) noexcept
-                {
-                    this->m_vertices.emplace_back(attributes...);
-                }, vertex);
-        }
+        append(first);
+        (append(std::forward<Vertices>(rest)), ...);
 
-        this->m_stride = Vertex::calculateStride<VertexAttributes...>();
-
-        const Vertex::Layout<VertexAttributes...> layout = Vertex::createLayout<VertexAttributes...>();
-        this->m_attributes.assign(layout.begin(), layout.end());
+        this->m_attributes.assign_range(Vertex::createLayout<Attributes...>());
 
         assert(std::ranges::all_of(this->m_vertices,
             [this](const Vertex& vertex) noexcept
@@ -88,11 +93,13 @@ namespace ikk
 
     constexpr const Vertex& VertexBuffer::operator[](std::size_t index) const noexcept
     {
+        assert(index < this->m_vertices.size());
         return this->m_vertices[index];
     }
 
     constexpr Vertex& VertexBuffer::operator[](std::size_t index) noexcept
     {
+        assert(index < this->m_vertices.size());
         return this->m_vertices[index];
     }
 
@@ -124,5 +131,25 @@ namespace ikk
     constexpr std::span<Vertex> VertexBuffer::vertices() noexcept
     {
         return this->m_vertices;
+    }
+
+    constexpr std::vector<Vertex>::const_iterator VertexBuffer::begin() const noexcept
+    {
+        return this->m_vertices.begin();
+    }
+
+    constexpr std::vector<Vertex>::iterator VertexBuffer::begin() noexcept
+    {
+        return this->m_vertices.begin();
+    }
+
+    constexpr std::vector<Vertex>::const_iterator VertexBuffer::end() const noexcept
+    {
+        return this->m_vertices.end();
+    }
+
+    constexpr std::vector<Vertex>::iterator VertexBuffer::end() noexcept
+    {
+        return this->m_vertices.end();
     }
 }

@@ -8,6 +8,7 @@ set(INARIKONKON_CORE_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Event/EventCallbackFuncs.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Event/EventManager.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/Renderer.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/Renderer/GenericGPUObject.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/Vulkan/Vulkan.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/OpenGL/OpenGL.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Renderer/OpenGL/Objects/ObjectBuffers.cppm

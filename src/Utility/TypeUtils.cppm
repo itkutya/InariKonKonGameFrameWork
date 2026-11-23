@@ -124,7 +124,7 @@ export namespace ikk
     };
 
     template<class T>
-    [[nodiscard]] constexpr std::size_t getTypeID() noexcept
+    [[nodiscard]] constexpr std::size_t getTypeHashOf() noexcept
     {
         return typeid(std::remove_cvref_t<T>).hash_code();
     }

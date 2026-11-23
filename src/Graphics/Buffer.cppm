@@ -104,7 +104,7 @@ namespace ikk
     template<BufferCompatible T>
     constexpr bool Buffer::contains(const Buffer::Descriptor& descriptor) const noexcept
     {
-        return  descriptor.hash == getTypeID<T>()                       &&
+        return  descriptor.hash == getTypeHashOf<T>()                   &&
                 descriptor.size >= sizeof(T)                            &&
                 descriptor.offset <= this->m_data.size()                &&
                 descriptor.size <= this->m_data.size() - descriptor.offset;
@@ -145,7 +145,7 @@ namespace ikk
                 {
                     .offset = offset,
                     .size = size,
-                    .hash = getTypeID<T>()
+                    .hash = getTypeHashOf<T>()
                 }};
         }
         catch (...)

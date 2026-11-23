@@ -1,20 +1,9 @@
-module;
-
-#include <algorithm>
-#include <array>
-#include <cassert>
-#include <cmath>
-#include <concepts>
-#include <cstdint>
-#include <functional>
-#include <numeric>
-#include <ranges>
-#include <type_traits>
-#include <utility>
-
 export module Vector;
 
+import std;
+
 import Number;
+import Assert;
 
 export namespace ikk
 {

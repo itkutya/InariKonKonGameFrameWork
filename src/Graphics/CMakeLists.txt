@@ -8,4 +8,5 @@ set(INARIKONKON_GRAPHICS_MODULES
     ${CMAKE_CURRENT_LIST_DIR}/Shader.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Camera.cppm
     ${CMAKE_CURRENT_LIST_DIR}/Buffer.cppm
+    ${CMAKE_CURRENT_LIST_DIR}/GenericCPUObject.cppm
     PARENT_SCOPE)
