@@ -46,6 +46,7 @@ export namespace ikk
     using Colorf    = BasicColor<Clamped<float, 0.f, 1.f>>;
     using Coloru8   = BasicColor<std::uint8_t>;
     using Color     = Coloru8;
+    using Colour    = Color;
 }
 
 namespace ikk

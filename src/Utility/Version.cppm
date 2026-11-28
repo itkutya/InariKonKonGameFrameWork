@@ -1,8 +1,6 @@
-module;
-
-#include <cstdint>
-
 export module Version;
+
+import std;
 
 export namespace ikk
 {

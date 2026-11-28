@@ -52,23 +52,20 @@ export namespace ikk
 
     [[nodiscard]] inline constexpr Time seconds(BasicNumber auto amount) noexcept
     {
-        using ReturnType = std::chrono::seconds;
-        using Rep = ReturnType::rep;
-        return Time{ReturnType(static_cast<Rep>(amount))};
+        using ReturnType = std::chrono::duration<long double, std::chrono::seconds::period>;
+        return Time{ReturnType(static_cast<long double>(amount))};
     }
 
     [[nodiscard]] inline constexpr Time milliseconds(BasicNumber auto amount) noexcept
     {
-        using ReturnType = std::chrono::milliseconds;
-        using Rep = ReturnType::rep;
-        return Time{ReturnType(static_cast<Rep>(amount))};
+        using ReturnType = std::chrono::duration<long double, std::chrono::milliseconds::period>;
+        return Time{ReturnType(static_cast<long double>(amount))};
     }
 
     [[nodiscard]] inline constexpr Time microseconds(BasicNumber auto amount) noexcept
     {
-        using ReturnType = std::chrono::microseconds;
-        using Rep = ReturnType::rep;
-        return Time{ReturnType(static_cast<Rep>(amount))};
+        using ReturnType = std::chrono::duration<long double, std::chrono::microseconds::period>;
+        return Time{ReturnType(static_cast<long double>(amount))};
     }
 }
 
@@ -139,13 +136,17 @@ namespace ikk
 
     constexpr Time& Time::operator*=(BasicNumber auto scale) noexcept
     {
-        this->m_value *= static_cast<std::chrono::nanoseconds::rep>(scale);
+        using FloatingDuration = std::chrono::duration<long double, std::nano>;
+        this->m_value = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            FloatingDuration{static_cast<FloatingDuration::rep>(this->m_value.count()) * static_cast<FloatingDuration::rep>(scale)});
         return *this;
     }
 
     constexpr Time& Time::operator/=(BasicNumber auto scale) noexcept
     {
-        this->m_value /= static_cast<std::chrono::nanoseconds::rep>(scale);
+        using FloatingDuration = std::chrono::duration<long double, std::nano>;
+        this->m_value = std::chrono::duration_cast<std::chrono::nanoseconds>(
+            FloatingDuration{static_cast<FloatingDuration::rep>(this->m_value.count()) / static_cast<FloatingDuration::rep>(scale)});
         return *this;
     }
 

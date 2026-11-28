@@ -1,13 +1,10 @@
 module;
 
-#include <cstdint>
-#include <functional>
-#include <optional>
-#include <utility>
-
 #include "entt/entity/registry.hpp"
 
 export module Entity;
+
+import std;
 
 import EntityContext;
 import Log;
@@ -29,7 +26,7 @@ export namespace ikk
 
         ~Entity() noexcept;
 
-        [[nodiscard]] operator bool() const noexcept;
+        [[nodiscard]] explicit operator bool() const noexcept;
 
         [[nodiscard]] bool operator==(const Entity& other) const noexcept;
         [[nodiscard]] bool operator!=(const Entity& other) const noexcept;
@@ -43,9 +40,9 @@ export namespace ikk
         void addComponent(Args&&... args) noexcept;
 
         template<class T>
-        [[nodiscard]] std::optional<std::reference_wrapper<const T>> getComponent() const noexcept;
+        [[nodiscard]] const T* getComponent() const noexcept;
         template<class T>
-        [[nodiscard]] std::optional<std::reference_wrapper<T>> getComponent() noexcept;
+        [[nodiscard]] T* getComponent() noexcept;
 
         template<class... Ts>
         [[nodiscard]] bool hasComponents() const noexcept;
@@ -66,12 +63,12 @@ export namespace ikk
 namespace ikk
 {
     Entity::Entity(EntityCreationKey key) noexcept
-        : Entity(EntityStorage{ .id = entt::null, .registry = key.registry })
+        : Entity(EntityStorage{ .id = entt::null, .registry = std::move(key.registry) })
     {
     }
 
     Entity::Entity(EntityStorage storage) noexcept
-        : m_storage(storage)
+        : m_storage(std::move(storage))
     {
         if (this->m_storage.registry == nullptr)
             return;
@@ -190,25 +187,27 @@ namespace ikk
     }
 
     template<class T>
-    std::optional<std::reference_wrapper<const T>> Entity::getComponent() const noexcept
+    const T* Entity::getComponent() const noexcept
     {
-        if (this->hasComponents<T>() == true)
-            return std::optional<std::reference_wrapper<const T>>{this->m_storage.registry->get<T>(this->m_storage.id)};
-        return std::nullopt;
+        if (this->m_storage.registry == nullptr)
+            return nullptr;
+
+        return this->m_storage.registry->try_get<T>(this->m_storage.id);
     }
 
     template<class T>
-    std::optional<std::reference_wrapper<T>> Entity::getComponent() noexcept
+    T* Entity::getComponent() noexcept
     {
+        if (this->m_storage.registry == nullptr)
+            return nullptr;
+
         if (this->m_type != Type::Owner)
         {
             Log::Error("Cannot modify an entity through an observer entity.");
-            return std::nullopt;
+            return nullptr;
         }
 
-        if (this->hasComponents<T>() == true)
-            return std::optional<std::reference_wrapper<T>>{this->m_storage.registry->get<T>(this->m_storage.id)};
-        return std::nullopt;
+        return this->m_storage.registry->try_get<T>(this->m_storage.id);
     }
 
     template<class... Ts>

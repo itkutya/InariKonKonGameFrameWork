@@ -1,13 +1,10 @@
 module;
 
-#include <concepts>
-#include <memory>
-#include <tuple>
-#include <type_traits>
-
 #include "entt/entity/registry.hpp"
 
 export module EntityManager;
+
+import std;
 
 import EntityContext;
 import TypeUtils;
@@ -48,7 +45,7 @@ namespace ikk
 {
     EntityCreationKey EntityManager::getEntityCreationKey() const noexcept
     {
-        return EntityCreationKey{ .registry = this->m_registry.get() };
+        return EntityCreationKey{ .registry = this->m_registry };
     }
 
     Entity EntityManager::createEntity() const noexcept
@@ -77,9 +74,9 @@ namespace ikk
         for (auto view = this->m_registry->view<Components...>(); const auto entity : view)
         {
             if constexpr (HasEntity)
-                func(Entity{EntityStorage{ .id = entity, .registry = this->m_registry.get() }}, this->getComponent<Components>(view, entity)...);
+                std::forward<Func>(func)(Entity{EntityStorage{ .id = entity, .registry = this->m_registry }}, this->getComponent<Components>(view, entity)...);
             else
-                func(this->getComponent<Components>(view, entity)...);
+                std::forward<Func>(func)(this->getComponent<Components>(view, entity)...);
         }
     }
 

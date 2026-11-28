@@ -1,10 +1,6 @@
-module;
-
-#include <algorithm>
-#include <ranges>
-#include <vector>
-
 export module Hierarchy;
+
+import std;
 
 export namespace ikk
 {
@@ -12,6 +8,12 @@ export namespace ikk
     class Hierarchy
     {
     public:
+        Hierarchy(const Hierarchy&) noexcept = delete;
+        Hierarchy(Hierarchy&&) noexcept = delete;
+
+        Hierarchy& operator=(const Hierarchy&) noexcept = delete;
+        Hierarchy& operator=(Hierarchy&&) noexcept = delete;
+
         [[nodiscard]] const std::vector<T*>& getChildren() const noexcept;
         [[nodiscard]] const T* getParent() const noexcept;
 
@@ -26,12 +28,6 @@ export namespace ikk
 
         Hierarchy() noexcept = default;
 
-        Hierarchy(const Hierarchy& other) noexcept;
-        Hierarchy(Hierarchy&& other) noexcept;
-
-        Hierarchy& operator=(const Hierarchy& other) noexcept;
-        Hierarchy& operator=(Hierarchy&& other) noexcept;
-
         ~Hierarchy() noexcept;
 
         [[nodiscard]] std::vector<T*>& getChildren() noexcept;
@@ -39,6 +35,8 @@ export namespace ikk
 
         [[nodiscard]] const T& self() const noexcept;
         [[nodiscard]] T& self() noexcept;
+
+        void transferLinksTo(T& destination) noexcept;
 
         friend T;
     };
@@ -79,8 +77,8 @@ namespace ikk
 
         T& self = this->self();
 
-        for (T* p = &self; p != nullptr; p = p->getParent())
-            if (p == &child)
+        for (T* parent = &self; parent != nullptr; parent = parent->getParent())
+            if (parent == &child)
                 return;
 
         if (child.getParent() != nullptr)
@@ -99,54 +97,6 @@ namespace ikk
             *it = this->m_children.back();
             this->m_children.pop_back();
         }
-    }
-
-    //TODO:
-    template<class T>
-    Hierarchy<T>::Hierarchy(const Hierarchy& other) noexcept
-        : m_parent(other.m_parent), m_children(other.m_children)
-    {
-    }
-
-    template<class T>
-    Hierarchy<T>::Hierarchy(Hierarchy&& other) noexcept
-    {
-        if (other.m_parent != nullptr)
-            other.m_parent->addChild(this->self());
-
-        while (other.m_children.empty() == false)
-            this->addChild(*other.m_children.back());
-    }
-
-    //TODO:
-    template<class T>
-    Hierarchy<T>& Hierarchy<T>::operator=(const Hierarchy& other) noexcept
-    {
-        if (this != &other)
-        {
-            this->m_parent = other.m_parent;
-            this->m_children = other.m_children;
-        }
-        return *this;
-    }
-
-    template<class T>
-    Hierarchy<T>& Hierarchy<T>::operator=(Hierarchy&& other) noexcept
-    {
-        if (this != &other)
-        {
-            while (this->m_children.empty() == false)
-                this->removeChild(*this->m_children.back());
-
-            this->removeParent();
-
-            if (other.m_parent != nullptr)
-                other.m_parent->addChild(this->self());
-
-            while (other.m_children.empty() == false)
-                this->addChild(*other.m_children.back());
-        }
-        return *this;
     }
 
     template<class T>
@@ -181,5 +131,28 @@ namespace ikk
     T& Hierarchy<T>::self() noexcept
     {
         return *static_cast<T*>(this);
+    }
+
+    template<class T>
+    void Hierarchy<T>::transferLinksTo(T& destination) noexcept
+    {
+        T& source = this->self();
+
+        if (&source == &destination)
+            return;
+
+        destination.removeParent();
+        while (destination.getChildren().empty() == false)
+            destination.removeChild(*destination.getChildren().back());
+
+        if (this->m_parent != nullptr)
+        {
+            T* parent = this->m_parent;
+            parent->removeChild(source);
+            parent->addChild(destination);
+        }
+
+        while (this->m_children.empty() == false)
+            destination.addChild(*this->m_children.back());
     }
 }

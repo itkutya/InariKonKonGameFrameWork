@@ -1,19 +1,6 @@
-module;
-
-#include <algorithm>
-#include <array>
-#include <chrono>
-#include <cstdint>
-#include <functional>
-#include <ranges>
-#include <string>
-#include <type_traits>
-#include <unordered_map>
-#include <utility>
-#include <variant>
-#include <vector>
-
 export module InputManager;
+
+import std;
 
 import InputCombination;
 import InputCommon;
@@ -26,6 +13,7 @@ import Keyboard;
 import Mouse;
 
 import EventManager;
+import TypeUtils;
 import Event;
 import Flag;
 import Time;
@@ -53,7 +41,7 @@ export namespace ikk
         void setRepeatConfig(const std::string& key, const Input::RepeatSettings& config) noexcept;
 
         //TODO: Handel other inputs like axes & joystick hats
-        template<Input::Action Action, class Func> requires (std::is_invocable_v<Func>)
+        template<Input::Action Action, Callable Func>
         void on(const std::string& key, Func&& func) noexcept;
 
         template<InputType T>
@@ -149,7 +137,7 @@ namespace ikk
             Log::Warning("Cannot set repeat config for key '{}' since it could not be found.", key);
     }
 
-    template<Input::Action Action, class Func> requires (std::is_invocable_v<Func>)
+    template<Input::Action Action, Callable Func>
     void InputManager::on(const std::string& key, Func&& func) noexcept
     {
         if (const auto it = this->m_bindings.find(key); it != this->m_bindings.end())

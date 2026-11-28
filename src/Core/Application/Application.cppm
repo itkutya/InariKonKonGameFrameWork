@@ -1,16 +1,11 @@
 module;
 
-#include <functional>
-#include <memory>
-#include <optional>
-#include <string_view>
-#include <utility>
-#include <vector>
-
 #define GLFW_INCLUDE_NONE
 #include "GLFW/glfw3.h"
 
 export module Application;
+
+import std;
 
 import JoystickManager;
 import EventManager;
@@ -42,7 +37,7 @@ export namespace ikk
         [[nodiscard]] static std::optional<Application> create(const CreateSettings<T>& settings) noexcept;
 
         Application(Application&&) noexcept = default;
-        Application& operator=(Application&&) noexcept = default;
+        Application& operator=(Application&&) noexcept = delete;
 
         ~Application() noexcept = default;
 
@@ -57,6 +52,24 @@ export namespace ikk
         [[nodiscard]] const SceneManager& getSceneManager() const noexcept;
         [[nodiscard]] SceneManager& getSceneManager() noexcept;
     private:
+        class GLFWRunTime final : NonCopyable
+        {
+        public:
+            GLFWRunTime() noexcept;
+
+            GLFWRunTime(GLFWRunTime&& other) noexcept;
+            GLFWRunTime& operator=(GLFWRunTime&& other) noexcept;
+
+            ~GLFWRunTime() noexcept;
+
+            void reset() noexcept;
+
+            [[nodiscard]] bool isValid() const noexcept;
+        private:
+            bool m_active = false;
+        };
+
+        GLFWRunTime m_glfwRuntime{};
         Stopwatch m_deltaTimeClock{};
         SceneManager m_sceneManager{};
         Version m_version{};
@@ -65,7 +78,7 @@ export namespace ikk
         Window m_window;
 
         template<RendererType T>
-        explicit Application(const CreateSettings<T>& settings) noexcept;
+        explicit Application(GLFWRunTime&& glfwRunTime, const CreateSettings<T>& settings) noexcept;
 
         void handleEvents(IScene& scene) noexcept;
         void update(IScene& scene) noexcept;
@@ -80,11 +93,12 @@ namespace ikk
     {
         try
         {
-            glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
-            if (glfwInit() == GLFW_FALSE)
+            GLFWRunTime glfwRunTime{};
+
+            if (glfwRunTime.isValid() == false)
                 return std::nullopt;
 
-            Application app{settings};
+            Application app{std::move(glfwRunTime), settings};
             return std::optional{std::move(app)};
         }
         catch (...)
@@ -118,7 +132,7 @@ namespace ikk
     void Application::quit() noexcept
     {
         this->m_window.destroy();
-        glfwTerminate();
+        this->m_glfwRuntime.reset();
     }
 
     const Version& Application::getVersion() const noexcept
@@ -146,9 +160,47 @@ namespace ikk
         return this->m_sceneManager;
     }
 
+    Application::GLFWRunTime::GLFWRunTime() noexcept
+    {
+        glfwInitHint(GLFW_JOYSTICK_HAT_BUTTONS, GLFW_FALSE);
+        if (glfwInit() == GLFW_TRUE)
+            this->m_active = true;
+    }
+
+    Application::GLFWRunTime::GLFWRunTime(GLFWRunTime&& other) noexcept
+        : m_active(std::exchange(other.m_active, false))
+    {
+    }
+
+    Application::GLFWRunTime& Application::GLFWRunTime::operator=(GLFWRunTime&& other) noexcept
+    {
+        if (this != &other)
+        {
+            this->reset();
+            this->m_active = std::exchange(other.m_active, false);
+        }
+        return *this;
+    }
+
+    Application::GLFWRunTime::~GLFWRunTime() noexcept
+    {
+        this->reset();
+    }
+
+    void Application::GLFWRunTime::reset() noexcept
+    {
+        if (const bool value = std::exchange(this->m_active, false); value == true)
+            glfwTerminate();
+    }
+
+    bool Application::GLFWRunTime::isValid() const noexcept
+    {
+        return this->m_active;
+    }
+
     template<RendererType T>
-    Application::Application(const CreateSettings<T>& settings) noexcept
-        : m_version(settings.version), m_window(settings.windowSettings, settings.renderer)
+    Application::Application(GLFWRunTime&& glfwRunTime, const CreateSettings<T>& settings) noexcept
+        : m_glfwRuntime(std::move(glfwRunTime)), m_version(settings.version), m_window(settings.windowSettings, settings.renderer)
     {
     }
 
@@ -177,7 +229,7 @@ namespace ikk
     void Application::render(IScene& scene) noexcept
     {
         if (const std::unique_ptr<IRenderer>& renderer = this->m_window.getRenderer(); renderer != nullptr &&
-            renderer->beginFrame(this->m_window.getSettings().clearColor) == true)
+            renderer->beginFrame(this->m_window.getClearColor()) == true)
         {
             scene.onRender(renderer);
             renderer->endFrame();

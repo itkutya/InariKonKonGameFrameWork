@@ -1,8 +1,6 @@
-module;
-
-#include <variant>
-
 export module Transform;
+
+import std;
 
 import Hierarchy;
 
@@ -66,11 +64,11 @@ export namespace ikk
         [[nodiscard]] constexpr Transform(PositionType position, EulerAnglesDegf rotation, ScaleType scale = ScaleType(1.f)) noexcept;
         [[nodiscard]] explicit constexpr Transform(PositionType position, EulerAnglesRadf rotation = {}, ScaleType scale = ScaleType(1.f)) noexcept;
 
-        constexpr Transform(const Transform&) noexcept = default;
-        constexpr Transform(Transform&&) noexcept = default;
+        constexpr Transform(const Transform& other) noexcept;
+        constexpr Transform(Transform&& other) noexcept;
 
-        constexpr Transform& operator=(const Transform&) noexcept = default;
-        constexpr Transform& operator=(Transform&&) noexcept = default;
+        constexpr Transform& operator=(const Transform& other) noexcept;
+        constexpr Transform& operator=(Transform&& other) noexcept;
 
         constexpr ~Transform() noexcept = default;
 
@@ -141,6 +139,50 @@ namespace ikk
     constexpr Transform<D>::Transform(PositionType position, EulerAnglesRadf rotation, ScaleType scale) noexcept
         : m_localPosition(position), m_localRotation(rotation), m_localScale(scale)
     {
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>::Transform(const Transform& other) noexcept
+        : m_localPosition(other.m_localPosition),
+          m_localRotation(other.m_localRotation),
+          m_localScale(other.m_localScale)
+    {
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>::Transform(Transform&& other) noexcept
+        : m_localPosition(std::move(other.m_localPosition)),
+          m_localRotation(std::move(other.m_localRotation)),
+          m_localScale(std::move(other.m_localScale))
+    {
+        other.transferLinksTo(*this);
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>& Transform<D>::operator=(const Transform& other) noexcept
+    {
+        if (this != &other)
+        {
+            this->m_localPosition = other.m_localPosition;
+            this->m_localRotation = other.m_localRotation;
+            this->m_localScale = other.m_localScale;
+            this->m_dirty = true;
+        }
+        return *this;
+    }
+
+    template<Dimension D>
+    constexpr Transform<D>& Transform<D>::operator=(Transform&& other) noexcept
+    {
+        if (this != &other)
+        {
+            this->m_localPosition = std::move(other.m_localPosition);
+            this->m_localRotation = std::move(other.m_localRotation);
+            this->m_localScale = std::move(other.m_localScale);
+            this->m_dirty = true;
+            other.transferLinksTo(*this);
+        }
+        return *this;
     }
 
     template<Dimension D>

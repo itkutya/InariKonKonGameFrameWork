@@ -4,16 +4,18 @@ module;
 
 export module EntityContext;
 
+import std;
+
 export namespace ikk
 {
     struct EntityStorage
     {
         entt::entity id{entt::null};
-        entt::registry* registry{nullptr};
+        std::shared_ptr<entt::registry> registry{nullptr};
     };
 
     struct EntityCreationKey
     {
-        entt::registry* registry{nullptr};
+        std::shared_ptr<entt::registry> registry{nullptr};
     };
 }
